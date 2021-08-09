@@ -11,7 +11,7 @@ process demultiplex {
         tuple val(name), path("fastq"), emit: demultiplexed_fastq_dir
     script:
         """
-        Barcode_kit=${"SQK-RPB004"}
+        Barcode_kit=${"EXP-NBD104"}
         ## EXP-NBD114
         ## EXP-NBD104
         guppy_barcoder -t ${task.cpus} -i ${dir} -s fastq --trim_barcodes --barcode_kits \$Barcode_kit 
