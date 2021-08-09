@@ -102,7 +102,7 @@ include { adaptive_sampling_wf } from './workflows/adaptive_sampling'
 include { read_qc_wf } from './workflows/read_qc'
 include { sequencing_summary_wf } from './workflows/sequencing_summary'
 include { rename } from './workflows/rename.nf'
-include { stats_wf } from './workflows/stats'
+// include { stats_wf } from './workflows/stats'
 
 /************************** 
 * MAIN WORKFLOW

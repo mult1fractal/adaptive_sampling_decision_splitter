@@ -13,6 +13,7 @@ process demultiplex {
         """
         Barcode_kit=${"SQK-RPB004"}
         ## EXP-NBD114
+        ## EXP-NBD104
         guppy_barcoder -t ${task.cpus} -i ${dir} -s fastq --trim_barcodes --barcode_kits \$Barcode_kit 
         ## eventually add gzip for bacodes
         """
