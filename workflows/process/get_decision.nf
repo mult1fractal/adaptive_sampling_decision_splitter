@@ -7,12 +7,12 @@ process get_decision {
         path("*_${name}_read_id.txt")
     script:
         """
-        ## get all decisions of read until file
-        cat ${read_until} | tail -n+2 | cut -d"," -f8 | sort -u > decision_list.txt
+        ## get all decisions of read until file f7-decisio
+        cat ${read_until} | tail -n+2 | cut -d"," -f7 | sort -u > decision_list.txt
 
-        ##  create read- id list per decision
+        ##  create read- id list per decision f5-read-id
         while read line; do  
-            grep -w "\$line" ${read_until} | cut -d"," -f6 | sort -u > "\$line"_${name}_read_id.txt 
+            grep -w "\$line" ${read_until} | cut -d"," -f5 | sort -u > "\$line"_${name}_read_id.txt 
             done < decision_list.txt
 
         ## remove dupes from no decision that are in unblock 
