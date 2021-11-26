@@ -152,49 +152,17 @@ nextflow run sample_me.nf --samples test_data/sequencing_output/115_VT0_deep_seq
 nextflow run sample_me.nf --fastq 'results/11*/*fastq.gz' --read_qc -profile local,docker -work-dir work/ --cores 10 --output results/nanoplot
 
 
-nextflow run sample_me.nf --demultiplex \
---sample /mnt/nano-server/GRIDION_DISK/115_VT0_deep_seq_ad-sam_deplete/115_VT0_deep_seq_ad-sam_deplete/115_VT0_deep_seq_ad-sam_barcode_overview.csv \
---fastq_pass /mnt/nano-server/GRIDION_DISK/115_VT0_deep_seq_ad-sam_deplete/115_VT0_deep_seq_ad-sam_deplete/fastq_pass/ \
---read_until /mnt/nano-server/GRIDION_DISK/115_VT0_deep_seq_ad-sam_deplete/115_VT0_deep_seq_ad-sam_deplete/read_until_FAP76673_e0481cad.csv \
+nextflow run read_split.nf --demultiplex \
+--barcode_kit EXP-NBD104 \
+--samples /media/mike/6C400D03400CD62C/reseq_adrian/sample_id_20211124.csv \
+--fastq_pass /media/mike/6C400D03400CD62C/reseq_adrian/20211125_reseq_LZ_6h_AS_C/20211125_reseq_LZ_6h_AS_C/20211125_1358_X1_FAR97070_812a447f/fastq_pass/ \
+--read_until /media/mike/6C400D03400CD62C/reseq_adrian/20211125_reseq_LZ_6h_AS_C/20211125_reseq_LZ_6h_AS_C/20211125_1358_X1_FAR97070_812a447f/other_reports/adaptive_sampling_FAR97070_53126855.csv \
 -profile local,docker -work-dir work/ --cores 20 \
---output results/115_VT0_deep_seq_ad-sam_deplete   
-
-nextflow run sample_me.nf --demultiplex \
---sample /mnt/nano-server/GRIDION_DISK/116_VT2_deep_seq_ad-sam_deplete/116_VT2_deep_seq_ad-sam_deplete/116_VT2_deep_seq_ad-sam_barcode_overview.csv \
---fastq_pass /mnt/nano-server/GRIDION_DISK/116_VT2_deep_seq_ad-sam_deplete/116_VT2_deep_seq_ad-sam_deplete/fastq_pass/ \
---read_until /mnt/nano-server/GRIDION_DISK/116_VT2_deep_seq_ad-sam_deplete/116_VT2_deep_seq_ad-sam_deplete/read_until_FAP72996_1670fee8.csv \
--profile local,docker -work-dir work/ --cores 20 \
---output results/116_VT2_deep_seq_ad-sam_deplete 
-
-nextflow run sample_me.nf --demultiplex \
---sample /mnt/nano-server/GRIDION_DISK/115_VT0_deep_seq_ad-sam_enrich/115_VT0_deep_seq_ad-sam_enrich/115_VT0_deep_seq_ad-sam_enrich_barcode_overview.csv \
---fastq_pass /mnt/nano-server/GRIDION_DISK/115_VT0_deep_seq_ad-sam_enrich/115_VT0_deep_seq_ad-sam_enrich/fastq_pass/ \
---read_until /mnt/nano-server/GRIDION_DISK/115_VT0_deep_seq_ad-sam_enrich/115_VT0_deep_seq_ad-sam_enrich/read_until_FAP62194_9b996b42.csv \
--profile local,docker -work-dir work/ --cores 20 \
---output results/115_VT0_deep_seq_ad-sam_enrich 
-
-nextflow run sample_me.nf --demultiplex \
---sample /mnt/nano-server/GRIDION_DISK/116_VT2_deep_seq_ad-sam_enrich/116_VT2_deep_seq_ad-sam_enrich/116_VT2_deep_seq_ad-sam_enrich_barcode_overview.csv \
---fastq_pass /mnt/nano-server/GRIDION_DISK/116_VT2_deep_seq_ad-sam_enrich/116_VT2_deep_seq_ad-sam_enrich/fastq_pass/ \
---read_until /mnt/nano-server/GRIDION_DISK/116_VT2_deep_seq_ad-sam_enrich/116_VT2_deep_seq_ad-sam_enrich/read_until_FAP73179_495c84e0.csv \
--profile local,docker -work-dir work/ --cores 20 \
---output results/116_VT2_deep_seq_ad-sam_enrich 
+--output /media/mike/6C400D03400CD62C/reseq_adrian/results_20211125_reseq_LZ_6h_AS_C
 
 
 
-nextflow run sample_me.nf --demultiplex \
---samples test_data/sequencing_output/115_VT0_deep_seq_ad-sam_barcode_overview.csv \
---fastq_pass test_data/sequencing_output/fastq_pass/ \
---read_until test_data/sequencing_output/read_until_FAP76673_e0481cad.csv \
--profile local,docker -work-dir work/ --cores 20 \
---output results/test_naming 
-    
 
-nextflow run sample_me.nf --demultiplex \
---samples /mnt/nano-server/GRIDION_DISK/stat_deep_batch2/stat_deep_batch2/20210421_1241_X2_FAP84463_073c5e37/stat_deep_batch2.csv \
---fastq_pass /mnt/nano-server/GRIDION_DISK/stat_deep_batch2/stat_deep_batch2/20210421_1241_X2_FAP84463_073c5e37/fastq_pass/ \
--profile local,docker -work-dir work/ --cores 20 \
---output results/batch2_deep
 
     """.stripIndent()
 }
