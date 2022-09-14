@@ -68,19 +68,26 @@ if ( (params.cores.toInteger() > params.max_cores.toInteger()) && workflow.profi
         .map { file -> tuple(file.simpleName, file) }
     }
 
-// General fastq input channel
-    if (params.fastq) { fastq_file_ch = Channel
-        .fromPath( params.fastq, checkIfExists: true)
-        .map { file -> tuple(file.simpleName, file) }
-    }
+ // General fastq input channel
+     if (params.fastq) { fastq_file_ch = Channel
+         .fromPath( params.fastq, checkIfExists: true)
+         .map { file -> tuple(file.simpleName, file) }
+     }
 
-// samples input 
+// multiple sample names 
     if (params.samples) { samples_input_ch = Channel
         .fromPath( params.samples, checkIfExists: true)
         .splitCsv(header: true, sep: ',')
         .map { row -> tuple ("barcode${row.barcode[-2..-1]}", "${row._id}")}
         .view()
     }
+
+// single samplename
+    if (params.single) { single_sample_name_ch = Channel
+        .value( params.single )
+        .view()
+    }
+
 // read until file input
     if (params.read_until) { read_until_input_ch = Channel
         .fromPath( params.read_until, checkIfExists: true)
@@ -112,14 +119,15 @@ workflow {
 
         //demultiplex if params readuntil (fastq_dir_ch)
         // fastq input via dir and or files
-        //if ( (params.fastq || params.fastq_pass) || workflow.profile.contains('test_fastq')) { 
-            if (params.fastq_pass && !params.fastq) { fastq_input_raw_ch = collect_fastq_wf(fastq_dir_ch) }
-            if (!params.fastq_pass && params.fastq) { fastq_input_raw_ch = fastq_file_ch }
+        if (params.fastq_pass && !params.fastq) { fastq_input_raw_ch = collect_fastq_wf(fastq_dir_ch) }
+        if (!params.fastq_pass && params.fastq) { fastq_input_raw_ch = fastq_file_ch }
 
-            // raname barcodes based on --samples input.csv
-                if (params.samples) { fastq_input_ch = rename(fastq_input_raw_ch.join(samples_input_ch).map { it -> tuple(it[2],it[1])}).view() }
-                else if (!params.samples ) { fastq_input_ch = fastq_input_raw_ch }
-            
+        // raname barcodes based on --samples input.csv
+        if (params.samples && !params.single) { fastq_input_ch = rename(fastq_input_raw_ch.join(samples_input_ch).map { it -> tuple(it[2],it[1])}).view() }
+        // rename a single sample based on --single "sample_name"
+        else if (!params.samples && params.single) { fastq_input_ch = fastq_input_raw_ch }
+
+
             // adaptive sampling analysis
             if ( params.read_until ) { adaptive_sampling_wf(fastq_input_ch, read_until_input_ch) }
             //if ( params.fastq && params.read_qc) { read_qc_wf(fastq_input_ch) }
@@ -160,8 +168,17 @@ nextflow run read_split.nf --demultiplex \
 -profile local,docker -work-dir work/ --cores 20 \
 --output /media/mike/6C400D03400CD62C/reseq_adrian/results_20211125_reseq_LZ_6h_AS_C
 
+nextflow run read_split.nf \
+--fastq_pass test_data/single_sample_test/ \
+--read_until test_data/single_sample_test/adaptive_sampling_FAT40132_6e0eb7bb.csv \
+-profile local,docker -work-dir work/ --cores 20 \
+--output results/single_test \
+--single "test_sample_name"
 
 
+sample_id file.csv
+_id,barcode
+A1,barcode01
 
 
     """.stripIndent()
