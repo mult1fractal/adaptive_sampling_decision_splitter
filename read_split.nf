@@ -68,12 +68,6 @@ if ( (params.cores.toInteger() > params.max_cores.toInteger()) && workflow.profi
         .map { file -> tuple(file.simpleName, file) }
     }
 
- // General fastq input channel
-     if (params.fastq) { fastq_file_ch = Channel
-         .fromPath( params.fastq, checkIfExists: true)
-         .map { file -> tuple(file.simpleName, file) }
-     }
-
 // multiple sample names 
     if (params.samples) { samples_input_ch = Channel
         .fromPath( params.samples, checkIfExists: true)
@@ -104,11 +98,11 @@ if ( (params.cores.toInteger() > params.max_cores.toInteger()) && workflow.profi
 * Workflows
 **************************/
 
-include { collect_fastq_wf } from './workflows/collect_fastq.nf'
+include { collect_fastq_wf } from './workflows/collect_fastq'
 include { adaptive_sampling_wf } from './workflows/adaptive_sampling'
 include { read_qc_wf } from './workflows/read_qc'
 include { sequencing_summary_wf } from './workflows/sequencing_summary'
-include { rename } from './workflows/rename.nf'
+include { rename } from './workflows/rename'
 // include { stats_wf } from './workflows/stats'
 
 /************************** 
@@ -117,23 +111,14 @@ include { rename } from './workflows/rename.nf'
 
 workflow {
 
-        //demultiplex if params readuntil (fastq_dir_ch)
-        // fastq input via dir and or files
-        if (params.fastq_pass && !params.fastq) { fastq_input_raw_ch = collect_fastq_wf(fastq_dir_ch) }
-        if (!params.fastq_pass && params.fastq) { fastq_input_raw_ch = fastq_file_ch }
-
-        // raname barcodes based on --samples input.csv
-        if (params.samples && !params.single) { fastq_input_ch = rename(fastq_input_raw_ch.join(samples_input_ch).map { it -> tuple(it[2],it[1])}).view() }
-        // rename a single sample based on --single "sample_name"
-        else if (!params.samples && params.single) { fastq_input_ch = fastq_input_raw_ch }
-
-
-            // adaptive sampling analysis
-            if ( params.read_until ) { adaptive_sampling_wf(fastq_input_ch, read_until_input_ch) }
-            //if ( params.fastq && params.read_qc) { read_qc_wf(fastq_input_ch) }
-            
-            // Metrics
-            if ( params.seq_summary ) {sequencing_summary_wf(sequencing_summary_input_channel)}
+        // barcoded samples input    
+        if (params.fastq_pass && params.samples && !params.single) { fastq_input_ch = collect_fastq_wf(fastq_dir_ch).join(samples_input_ch).map { it -> tuple(it[2],it[1])}.view() }
+        // single sample input
+        if (params.fastq_pass && !params.samples && params.single) { fastq_input_ch = collect_fastq_wf(fastq_dir_ch) }
+        // demultiplex and Fastq split
+        if ( params.read_until ) { adaptive_sampling_wf(fastq_input_ch, read_until_input_ch) }
+        // Metrics
+        if ( params.seq_summary ) {sequencing_summary_wf(sequencing_summary_input_channel)}
 
            }
         

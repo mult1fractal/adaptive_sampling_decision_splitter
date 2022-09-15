@@ -12,7 +12,6 @@ process collect_fastq {
             find -L \${i} -name '*.fastq' -exec cat {} + | gzip > ${params.single}.fastq.gz
             find -L \${i} -name '*.fastq.gz' -exec zcat {} + | gzip >> ${params.single}.fastq.gz
         done
-
         find . -name "*.fastq.gz" -type 'f' -size -1500k -delete
         """
         else 
