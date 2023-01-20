@@ -144,7 +144,7 @@ nextflow run sample_me.nf --samples test_data/sequencing_output/115_VT0_deep_seq
 ## for nanoplot
 nextflow run sample_me.nf --fastq 'results/11*/*fastq.gz' --read_qc -profile local,docker -work-dir work/ --cores 10 --output results/nanoplot
 
-
+## multi sample input (not demultiplexed)
 nextflow run read_split.nf --demultiplex \
 --barcode_kit EXP-NBD104 \
 --samples /media/mike/6C400D03400CD62C/reseq_adrian/sample_id_20211124.csv \
@@ -153,6 +153,11 @@ nextflow run read_split.nf --demultiplex \
 -profile local,docker -work-dir work/ --cores 20 \
 --output /media/mike/6C400D03400CD62C/reseq_adrian/results_20211125_reseq_LZ_6h_AS_C
 
+sample_id file.csv
+_id,barcode
+A1,barcode01
+
+## Single sample input
 nextflow run read_split.nf \
 --fastq_pass test_data/single_sample_test/ \
 --read_until test_data/single_sample_test/adaptive_sampling_FAT40132_6e0eb7bb.csv \
@@ -161,9 +166,7 @@ nextflow run read_split.nf \
 --single "test_sample_name"
 
 
-sample_id file.csv
-_id,barcode
-A1,barcode01
+
 
 
     """.stripIndent()
