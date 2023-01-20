@@ -135,12 +135,6 @@ def helpMSG() {
     ____________________________________________________________________________________________
     
 
-
-
-
-nextflow run sample_me.nf --samples test_data/sequencing_output/115_VT0_deep_seq_ad-sam_barcode_overview.csv --fastq_pass test_data/sequencing_output/fastq_pass/ --demultiplex -profile local,docker -work-dir work/ --cores 10 --output results/demultiplex_test
-        
-    
 ## for nanoplot
 nextflow run sample_me.nf --fastq 'results/11*/*fastq.gz' --read_qc -profile local,docker -work-dir work/ --cores 10 --output results/nanoplot
 
@@ -152,6 +146,17 @@ nextflow run read_split.nf --demultiplex \
 --read_until /media/mike/6C400D03400CD62C/reseq_adrian/20211125_reseq_LZ_6h_AS_C/20211125_reseq_LZ_6h_AS_C/20211125_1358_X1_FAR97070_812a447f/other_reports/adaptive_sampling_FAR97070_53126855.csv \
 -profile local,docker -work-dir work/ --cores 20 \
 --output /media/mike/6C400D03400CD62C/reseq_adrian/results_20211125_reseq_LZ_6h_AS_C
+
+## multi sample input (already demultiplexed)
+nextflow run read_split.nf \
+--barcode_kit EXP-NBD104 \
+--samples /media/mike/6C400D03400CD62C/reseq_adrian/sample_id_20211124.csv \
+--fastq_pass /media/mike/6C400D03400CD62C/reseq_adrian/20211125_reseq_LZ_6h_AS_C/20211125_reseq_LZ_6h_AS_C/20211125_1358_X1_FAR97070_812a447f/fastq_pass/ \
+--read_until /media/mike/6C400D03400CD62C/reseq_adrian/20211125_reseq_LZ_6h_AS_C/20211125_reseq_LZ_6h_AS_C/20211125_1358_X1_FAR97070_812a447f/other_reports/adaptive_sampling_FAR97070_53126855.csv \
+-profile local,docker -work-dir work/ --cores 20 \
+--output /media/mike/6C400D03400CD62C/reseq_adrian/results_20211125_reseq_LZ_6h_AS_C
+
+
 
 sample_id file.csv
 _id,barcode
