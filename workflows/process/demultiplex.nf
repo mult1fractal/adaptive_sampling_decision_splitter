@@ -1,7 +1,7 @@
 process demultiplex {
     label 'guppy_demultiplex'
         if (workflow.profile.contains('docker')) {
-            container = 'nanozoo/guppy_gpu:4.4.1-1--a3fcea3'
+            container = 'nanozoo/guppy_gpu:6.4.6-1--2c17584'
         }
 
         //publishDir "${params.output}/${name}/", mode: 'copy'

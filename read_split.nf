@@ -101,7 +101,6 @@ if ( (params.cores.toInteger() > params.max_cores.toInteger()) && workflow.profi
 include { collect_fastq_wf } from './workflows/collect_fastq'
 include { adaptive_sampling_wf } from './workflows/adaptive_sampling'
 include { read_qc_wf } from './workflows/read_qc'
-include { sequencing_summary_wf } from './workflows/sequencing_summary'
 include { rename } from './workflows/rename'
 // include { stats_wf } from './workflows/stats'
 
@@ -110,18 +109,15 @@ include { rename } from './workflows/rename'
 **************************/
 
 workflow {
-
         // barcoded samples input    
         if (params.fastq_pass && params.samples && !params.single) { fastq_input_ch = collect_fastq_wf(fastq_dir_ch).join(samples_input_ch).map { it -> tuple(it[2],it[1])}.view() }
         // single sample input
         if (params.fastq_pass && !params.samples && params.single) { fastq_input_ch = collect_fastq_wf(fastq_dir_ch) }
         // demultiplex and Fastq split
         if ( params.read_until ) { adaptive_sampling_wf(fastq_input_ch, read_until_input_ch) }
-        // Metrics
-        if ( params.seq_summary ) {sequencing_summary_wf(sequencing_summary_input_channel)}
 
-           }
-        
+}
+
 /*************  
 * --help
 *************/
@@ -130,49 +126,21 @@ def helpMSG() {
     c_reset = "\033[0m";
     c_yellow = "\033[0;33m";
     c_blue = "\033[0;34m";
+    c_purple = "\033[0;35m";
     c_dim = "\033[2m";
     log.info """
-    ____________________________________________________________________________________________
-    
 
-## for nanoplot
-nextflow run sample_me.nf --fastq 'results/11*/*fastq.gz' --read_qc -profile local,docker -work-dir work/ --cores 10 --output results/nanoplot
+    WIP
 
-## multi sample input (not demultiplexed)
-nextflow run read_split.nf --demultiplex \
---barcode_kit EXP-NBD104 \
---samples /media/mike/6C400D03400CD62C/reseq_adrian/sample_id_20211124.csv \
---fastq_pass /media/mike/6C400D03400CD62C/reseq_adrian/20211125_reseq_LZ_6h_AS_C/20211125_reseq_LZ_6h_AS_C/20211125_1358_X1_FAR97070_812a447f/fastq_pass/ \
---read_until /media/mike/6C400D03400CD62C/reseq_adrian/20211125_reseq_LZ_6h_AS_C/20211125_reseq_LZ_6h_AS_C/20211125_1358_X1_FAR97070_812a447f/other_reports/adaptive_sampling_FAR97070_53126855.csv \
--profile local,docker -work-dir work/ --cores 20 \
---output /media/mike/6C400D03400CD62C/reseq_adrian/results_20211125_reseq_LZ_6h_AS_C
-
-## multi sample input (already demultiplexed)
-nextflow run read_split.nf \
---barcode_kit EXP-NBD104 \
---samples /media/mike/6C400D03400CD62C/reseq_adrian/sample_id_20211124.csv \
---fastq_pass /media/mike/6C400D03400CD62C/reseq_adrian/20211125_reseq_LZ_6h_AS_C/20211125_reseq_LZ_6h_AS_C/20211125_1358_X1_FAR97070_812a447f/fastq_pass/ \
---read_until /media/mike/6C400D03400CD62C/reseq_adrian/20211125_reseq_LZ_6h_AS_C/20211125_reseq_LZ_6h_AS_C/20211125_1358_X1_FAR97070_812a447f/other_reports/adaptive_sampling_FAR97070_53126855.csv \
--profile local,docker -work-dir work/ --cores 20 \
---output /media/mike/6C400D03400CD62C/reseq_adrian/results_20211125_reseq_LZ_6h_AS_C
+    nextflow run read_split.nf 
+    --fastq_pass foo/bar/FAT40132_pass_6e0eb7bb_0.fastq.gz 
+    --read_until foo/bar/adaptive_sampling_FAT40132_6e0eb7bb.csv 
+    --read_until /foo/bar/adaptive_sampling_FAT40132_6e0eb7bb.csv 
+    -profile local,docker 
+    -work-dir /foo/bar 
+    --cores 20 --output results/testing 
+    --single "testing"
 
 
-
-sample_id file.csv
-_id,barcode
-A1,barcode01
-
-## Single sample input
-nextflow run read_split.nf \
---fastq_pass test_data/single_sample_test/ \
---read_until test_data/single_sample_test/adaptive_sampling_FAT40132_6e0eb7bb.csv \
--profile local,docker -work-dir work/ --cores 20 \
---output results/single_test \
---single "test_sample_name"
-
-
-
-
-
-    """.stripIndent()
+        """.stripIndent()
 }

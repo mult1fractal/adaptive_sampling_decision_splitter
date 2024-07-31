@@ -7,6 +7,8 @@ workflow collect_fastq_wf {
     main:
         if (params.demultiplex && !params.single) { collect_fastq(demultiplex(fastq_dir)) }
         if (!params.demultiplex && params.single) { collect_fastq(fastq_dir) }
+        if (!params.demultiplex && params.samples) { collect_fastq(fastq_dir) }
+        
         fastq_channel = collect_fastq.out
                             .map { it -> it[1] }
                             .flatten()

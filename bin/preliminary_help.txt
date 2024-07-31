@@ -1,0 +1,50 @@
+ multi sample input (not demultiplexed)
+    nextflow run read_split.nf --demultiplex \
+    --barcode_kit EXP-NBD104 \
+    --samples /media/mike/6C400D03400CD62C/reseq_adrian/sample_id_20211124.csv \
+    --fastq_pass /media/mike/6C400D03400CD62C/reseq_adrian/20211125_reseq_LZ_6h_AS_C/20211125_reseq_LZ_6h_AS_C/20211125_1358_X1_FAR97070_812a447f/fastq_pass/ \
+    --read_until /media/mike/6C400D03400CD62C/reseq_adrian/20211125_reseq_LZ_6h_AS_C/20211125_reseq_LZ_6h_AS_C/20211125_1358_X1_FAR97070_812a447f/other_reports/adaptive_sampling_FAR97070_53126855.csv \
+    -profile local,docker -work-dir work/ --cores 20 \
+    --output /media/mike/6C400D03400CD62C/reseq_adrian/results_20211125_reseq_LZ_6h_AS_C
+
+    multi sample input (already demultiplexed)
+    nextflow run read_split.nf \
+    --barcode_kit EXP-NBD104 \
+    --samples /media/mike/6C400D03400CD62C/reseq_adrian/sample_id_20211124.csv \
+    --fastq_pass /media/mike/6C400D03400CD62C/reseq_adrian/20211125_reseq_LZ_6h_AS_C/20211125_reseq_LZ_6h_AS_C/20211125_1358_X1_FAR97070_812a447f/fastq_pass/ \
+    --read_until /media/mike/6C400D03400CD62C/reseq_adrian/20211125_reseq_LZ_6h_AS_C/20211125_reseq_LZ_6h_AS_C/20211125_1358_X1_FAR97070_812a447f/other_reports/adaptive_sampling_FAR97070_53126855.csv \
+    -profile local,docker -work-dir work/ --cores 20 \
+    --output /media/mike/6C400D03400CD62C/reseq_adrian/results_20211125_reseq_LZ_6h_AS_C
+
+
+
+    sample_id file.csv
+    _id,barcode
+    A1,barcode01
+
+    Single sample input
+    nextflow run read_split.nf \
+    --fastq_pass test_data/single_sample_test/ \
+    --read_until test_data/single_sample_test/adaptive_sampling_FAT40132_6e0eb7bb.csv \
+    -profile local,docker -work-dir work/ --cores 20 \
+    --output results/single_test \
+    --single "test_sample_name"
+
+    
+    rename Fastq_olny
+    n
+    nextflow run read_split.nf \
+    --fastq_pass /mnt/nano-server/GRIDION_DISK/Barcode_balancing_with_phages_and_bacteria_Tina_sebastian_samuel/20230207_phage_bac_barcode_balancing_mqt/20230207_phage_bac_barcode_balancing_mqt/20230207_1530_X3_FAT81737_c8dc5366/fastq_pass/ \
+    -profile local,docker \
+    -work-dir /mnt/6tb_1/work/ \
+    --cores 20 --output results/barcode_balancing_mqt \
+    --samples /home/mike/bioinformatics/sample_id_barcode_balancing.csv
+
+
+    Single sample input
+    nextflow run /home/mike/bioinformatics/adaptive_sampling_decision_splitter/read_split.nf \ 
+    --fastq_pass all_fastqs/ \
+    --read_until other_reports/adaptive_sampling_FAV27605_e99f723d.csv \
+    -profile local,docker -work-dir /mnt/6tb_1/work --cores 20 \
+    --output results/exp5_all_fail_pass_fastqs \
+    --single "exp5_all_fail_pass_fastqs"
