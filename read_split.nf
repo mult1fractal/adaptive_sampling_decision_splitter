@@ -138,7 +138,6 @@ def helpMSG() {
     nextflow run read_split.nf 
     --fastq_pass foo/bar/FAT40132_pass_6e0eb7bb_0.fastq.gz 
     --read_until foo/bar/adaptive_sampling_FAT40132_6e0eb7bb.csv 
-    --read_until /foo/bar/adaptive_sampling_FAT40132_6e0eb7bb.csv 
     -profile local,docker 
     -work-dir /foo/bar 
     --cores 20 --output results/testing 
