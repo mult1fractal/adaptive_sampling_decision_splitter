@@ -14,6 +14,9 @@ println "\033[0;33mporeCov requires at least Nextflow version " + XX + "." + YY 
 exit 1
 }
 
+
+if (params.help) { exit 0, helpMSG() }
+
 // profile helps
     if ( workflow.profile == 'standard' ) { exit 1, "NO EXECUTION PROFILE SELECTED, use e.g. [-profile local,docker]" }
     if (params.profile) { exit 1, "--profile is WRONG use -profile" }
