@@ -6,6 +6,15 @@ process collect_fastq {
     output:
         tuple val(name), path("*.fastq.gz"), emit: reads optional true
     script:
+         if (params.single && !params.samples)
+        """
+        for i in ${dir}; do
+            find -L \${i} -name '*.fastq' -exec cat {} + | gzip > ${params.single}.fastq.gz
+            find -L \${i} -name '*.fastq.gz' -exec zcat {} + | gzip >> ${params.single}.fastq.gz
+        done
+        #find . -name "*.fastq.gz" -type 'f' -size -1500k -delete
+        """
+        else 
         """
         for barcodes in ${dir}/barcode??*; do
             find -L \${barcodes} -name '*.fastq' -exec cat {} + | gzip > \${barcodes##*/}.fastq.gz

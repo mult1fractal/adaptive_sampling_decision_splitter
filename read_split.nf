@@ -68,19 +68,20 @@ if ( (params.cores.toInteger() > params.max_cores.toInteger()) && workflow.profi
         .map { file -> tuple(file.simpleName, file) }
     }
 
-// General fastq input channel
-    if (params.fastq) { fastq_file_ch = Channel
-        .fromPath( params.fastq, checkIfExists: true)
-        .map { file -> tuple(file.simpleName, file) }
-    }
-
-// samples input 
+// multiple sample names 
     if (params.samples) { samples_input_ch = Channel
         .fromPath( params.samples, checkIfExists: true)
         .splitCsv(header: true, sep: ',')
         .map { row -> tuple ("barcode${row.barcode[-2..-1]}", "${row._id}")}
         .view()
     }
+
+// single samplename
+    if (params.single) { single_sample_name_ch = Channel
+        .value( params.single )
+        .view()
+    }
+
 // read until file input
     if (params.read_until) { read_until_input_ch = Channel
         .fromPath( params.read_until, checkIfExists: true)
@@ -97,11 +98,10 @@ if ( (params.cores.toInteger() > params.max_cores.toInteger()) && workflow.profi
 * Workflows
 **************************/
 
-include { collect_fastq_wf } from './workflows/collect_fastq.nf'
+include { collect_fastq_wf } from './workflows/collect_fastq'
 include { adaptive_sampling_wf } from './workflows/adaptive_sampling'
 include { read_qc_wf } from './workflows/read_qc'
-include { sequencing_summary_wf } from './workflows/sequencing_summary'
-include { rename } from './workflows/rename.nf'
+include { rename } from './workflows/rename'
 // include { stats_wf } from './workflows/stats'
 
 /************************** 
@@ -109,26 +109,15 @@ include { rename } from './workflows/rename.nf'
 **************************/
 
 workflow {
+        // barcoded samples input    
+        if (params.fastq_pass && params.samples && !params.single) { fastq_input_ch = collect_fastq_wf(fastq_dir_ch).join(samples_input_ch).map { it -> tuple(it[2],it[1])}.view() }
+        // single sample input
+        if (params.fastq_pass && !params.samples && params.single) { fastq_input_ch = collect_fastq_wf(fastq_dir_ch) }
+        // demultiplex and Fastq split
+        if ( params.read_until ) { adaptive_sampling_wf(fastq_input_ch, read_until_input_ch) }
 
-        //demultiplex if params readuntil (fastq_dir_ch)
-        // fastq input via dir and or files
-        //if ( (params.fastq || params.fastq_pass) || workflow.profile.contains('test_fastq')) { 
-            if (params.fastq_pass && !params.fastq) { fastq_input_raw_ch = collect_fastq_wf(fastq_dir_ch) }
-            if (!params.fastq_pass && params.fastq) { fastq_input_raw_ch = fastq_file_ch }
+}
 
-            // raname barcodes based on --samples input.csv
-                if (params.samples) { fastq_input_ch = rename(fastq_input_raw_ch.join(samples_input_ch).map { it -> tuple(it[2],it[1])}).view() }
-                else if (!params.samples ) { fastq_input_ch = fastq_input_raw_ch }
-            
-            // adaptive sampling analysis
-            if ( params.read_until ) { adaptive_sampling_wf(fastq_input_ch, read_until_input_ch) }
-            //if ( params.fastq && params.read_qc) { read_qc_wf(fastq_input_ch) }
-            
-            // Metrics
-            if ( params.seq_summary ) {sequencing_summary_wf(sequencing_summary_input_channel)}
-
-           }
-        
 /*************  
 * --help
 *************/
@@ -137,32 +126,21 @@ def helpMSG() {
     c_reset = "\033[0m";
     c_yellow = "\033[0;33m";
     c_blue = "\033[0;34m";
+    c_purple = "\033[0;35m";
     c_dim = "\033[2m";
     log.info """
-    ____________________________________________________________________________________________
-    
+
+    WIP
+
+    nextflow run read_split.nf 
+    --fastq_pass foo/bar/FAT40132_pass_6e0eb7bb_0.fastq.gz 
+    --read_until foo/bar/adaptive_sampling_FAT40132_6e0eb7bb.csv 
+    --read_until /foo/bar/adaptive_sampling_FAT40132_6e0eb7bb.csv 
+    -profile local,docker 
+    -work-dir /foo/bar 
+    --cores 20 --output results/testing 
+    --single "testing"
 
 
-
-
-nextflow run sample_me.nf --samples test_data/sequencing_output/115_VT0_deep_seq_ad-sam_barcode_overview.csv --fastq_pass test_data/sequencing_output/fastq_pass/ --demultiplex -profile local,docker -work-dir work/ --cores 10 --output results/demultiplex_test
-        
-    
-## for nanoplot
-nextflow run sample_me.nf --fastq 'results/11*/*fastq.gz' --read_qc -profile local,docker -work-dir work/ --cores 10 --output results/nanoplot
-
-
-nextflow run read_split.nf --demultiplex \
---barcode_kit EXP-NBD104 \
---samples /media/mike/6C400D03400CD62C/reseq_adrian/sample_id_20211124.csv \
---fastq_pass /media/mike/6C400D03400CD62C/reseq_adrian/20211125_reseq_LZ_6h_AS_C/20211125_reseq_LZ_6h_AS_C/20211125_1358_X1_FAR97070_812a447f/fastq_pass/ \
---read_until /media/mike/6C400D03400CD62C/reseq_adrian/20211125_reseq_LZ_6h_AS_C/20211125_reseq_LZ_6h_AS_C/20211125_1358_X1_FAR97070_812a447f/other_reports/adaptive_sampling_FAR97070_53126855.csv \
--profile local,docker -work-dir work/ --cores 20 \
---output /media/mike/6C400D03400CD62C/reseq_adrian/results_20211125_reseq_LZ_6h_AS_C
-
-
-
-
-
-    """.stripIndent()
+        """.stripIndent()
 }
